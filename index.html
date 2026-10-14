@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz: Onde você se encaixa?</title>
+
+  <!-- META TAGS OPEN GRAPH (Para o WhatsApp e Redes Sociais) -->
+  <meta property="og:title" content="Quiz: Descubra onde você se encaixa na política" />
+  <meta property="og:description" content="Responda a perguntas simples do dia a dia e entenda qual visão combina mais com você!" />
+  <meta property="og:image" content="https://seusite.com/og-image.jpg" /> <!-- Suba a imagem do banner para seu servidor e troque este link -->
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://seusite.com" />
+
+  <!-- ESTILOS CSS -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f4f6f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+    .container { background: #fff; width: 100%; max-width: 520px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 24px; position: relative; overflow: hidden; }
+    
+    /* Telas */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    h1, h2 { text-align: center; color: #1e293b; margin-bottom: 12px; font-weight: 700; }
+    p.subtitle { text-align: center; color: #64748b; font-size: 15px; margin-bottom: 24px; }
+
+    /* Progresso */
+    .progress-bar-bg { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+    .progress-bar-fill { background: #2563eb; height: 100%; width: 0%; transition: width 0.3s ease; }
+    .badge { display: inline-block; background: #e0e7ff; color: #3730a3; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-bottom: 8px; }
+
+    /* Opções */
+    .options-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .btn-option { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: left; font-size: 15px; color: #334155; cursor: pointer; transition: all 0.2s ease; line-height: 1.4; }
+    .btn-option:hover { border-color: #2563eb; background: #eff6ff; }
+
+    /* Botão Principal */
+    .btn-primary { background: #16a34a; color: white; border: none; width: 100%; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: #15803d; }
+
+    /* Resultado Final */
+    .spectrum-container { margin: 24px 0; }
+    .spectrum-bar { height: 24px; border-radius: 12px; background: linear-gradient(90deg, #dc2626 0%, #cbd5e1 50%, #2563eb 100%); position: relative; margin-bottom: 8px; }
+    .spectrum-pin { position: absolute; top: -6px; width: 12px; height: 36px; background: #0f172a; border: 2px solid #fff; border-radius: 6px; transform: translateX(-50%); transition: left 0.8s ease-out; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+    .spectrum-labels { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #64748b; }
+
+    .choices-list { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+    .choice-item { font-size: 13px; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .choice-item.esquerda { background: #fef2f2; border-left: 4px solid #dc2626; color: #991b1b; }
+    .choice-item.direita { background: #eff6ff; border-left: 4px solid #2563eb; color: #1e40af; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- TELA 1: INÍCIO -->
+    <div id="screen-welcome" class="screen active">
+      <h1>Onde Você Se Encaixa?</h1>
+      <p class="subtitle">Responda a perguntas simples do dia a dia sobre a sociedade para descobrir seu alinhamento político!</p>
+      <button class="btn-primary" onclick="startQuiz()">Começar Quiz</button>
+    </div>
+
+    <!-- TELA 2: PERGUNTAS -->
+    <div id="screen-quiz" class="screen">
+      <div class="progress-bar-bg"><div id="progress" class="progress-bar-fill"></div></div>
+      <span id="topic-badge" class="badge">Tema</span>
+      <h2 id="question-text" style="text-align: left; font-size: 18px; margin-top: 6px;">Pergunta</h2>
+      <div id="options-container" class="options-grid"></div>
+    </div>
+
+    <!-- TELA 3: RESULTADO -->
+    <div id="screen-result" class="screen">
+      <h2>Seu Resultado</h2>
+      <p id="result-summary" class="subtitle" style="margin-bottom: 12px; font-weight: 600; color: #1e293b;"></p>
+
+      <div class="spectrum-container">
+        <div class="spectrum-bar">
+          <div id="spectrum-pin" class="spectrum-pin" style="left: 50%;"></div>
+        </div>
+        <div class="spectrum-labels">
+          <span>100%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <h3 style="font-size: 15px; color: #475569; margin-top: 20px; text-align: left;">O que você escolheu:</h3>
+      <div id="choices-history" class="choices-list"></div>
+
+      <button class="btn-primary" style="margin-top: 24px; background: #475569;" onclick="startQuiz()">Refazer Quiz</button>
+    </div>
+
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT -->
+  <script>
+    const questions = [
+      {
+        topic: "Saúde e Escolas",
+        title: "Como deve ser o atendimento básico para a população?",
+        opE: "Tudo deve ser de graça e mantido pelo governo para todos.",
+        opD: "O governo cuida dos mais pobres e incentiva escolas e hospitais particulares."
+      },
+      {
+        topic: "Dinheiro e Impostos",
+        title: "Como o governo deve cobrar impostos?",
+        opE: "Quem ganha muito dinheiro deve pagar muito mais imposto.",
+        opD: "Os impostos devem ser baixos para todos criarem empregos."
+      },
+      {
+        topic: "Empregos",
+        title: "Como proteger quem trabalha?",
+        opE: "O governo deve criar regras rígidas para cuidar do trabalhador.",
+        opD: "Patrão e empregado negociam direto sem o governo atrapalhar."
+      },
+      {
+        topic: "Segurança",
+        title: "Qual a melhor forma de combater o crime?",
+        opE: "Investir em educação, trabalho e cuidar de quem precisa.",
+        opD: "Leis mais severas e punição firme para os criminosos."
+      },
+      {
+        topic: "Empresas do Governo",
+        title: "Quem deve cuidar de luz, água e transporte?",
+        opE: "O governo, para garantir preço justo e não focar só em lucro.",
+        opD: "Empresas privadas, porque prestam um serviço melhor e mais rápido."
+      },
+      {
+        topic: "Meio Ambiente",
+        title: "Como proteger a natureza?",
+        opE: "Fiscalizar e limitar empresas para preservar o meio ambiente.",
+        opD: "Facilitar regras ambientais para incentivar obras e o progresso."
+      }
+    ];
+
+    let currentIdx = 0;
+    let userAnswers = [];
+
+    function startQuiz() {
+      currentIdx = 0;
+      userAnswers = [];
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIdx];
+      document.getElementById('topic-badge').innerText = q.topic;
+      document.getElementById('question-text').innerText = q.title;
+      document.getElementById('progress').style.width = `${(currentIdx / questions.length) * 100}%`;
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      // Aleatoriza a ordem A/B
+      const isEFirst = Math.random() < 0.5;
+      const first = isEFirst ? { text: q.opE, type: 'E' } : { text: q.opD, type: 'D' };
+      const second = isEFirst ? { text: q.opD, type: 'D' } : { text: q.opE, type: 'E' };
+
+      [first, second].forEach(op => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.innerText = op.text;
+        btn.onclick = () => handleSelect(op.type, q.topic, op.text);
+        container.appendChild(btn);
+      });
+    }
+
+    function handleSelect(type, topic, choiceText) {
+      userAnswers.push({ type, topic, choiceText });
+      currentIdx++;
+
+      if (currentIdx < questions.length) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      showScreen('screen-result');
+      
+      const countE = userAnswers.filter(a => a.type === 'E').length;
+      const countD = userAnswers.length - countE;
+      
+      // Esquerda no lado 0%, Direita no lado 100%
+      const percE = Math.round((countE / questions.length) * 100);
+      const percD = 100 - percE;
+
+      // Posição no slider (Esquerda = 0% da barra, Direita = 100% da barra)
+      const pinPosition = percD; 
+
+      document.getElementById('spectrum-pin').style.left = `${pinPosition}%`;
+
+      let labelResult = "";
+      if (percE > 60) labelResult = `${percE}% Alinhado à Esquerda`;
+      else if (percD > 60) labelResult = `${percD}% Alinhado à Direita`;
+      else labelResult = "Equilibrado / Centro";
+
+      document.getElementById('result-summary').innerText = labelResult;
+
+      // Histórico
+      const historyContainer = document.getElementById('choices-history');
+      historyContainer.innerHTML = '';
+
+      userAnswers.forEach(ans => {
+        const item = document.createElement('div');
+        item.className = `choice-item ${ans.type === 'E' ? 'esquerda' : 'direita'}`;
+        item.innerHTML = `
+          <span><strong>${ans.topic}:</strong> ${ans.choiceText}</span>
+          <span style="font-weight:bold; margin-left:10px;">${ans.type === 'E' ? 'Esquerda' : 'Direita'}</span>
+        `;
+        historyContainer.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>
