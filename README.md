@@ -1,6 +1,6 @@
 # 🧭 Quiz: Onde Você Se Encaixa?
 
-Uma aplicação web interativa, leve e didática projetada para público geral. O objetivo do quiz é explicar conceitos do espectro político de forma prática e acessível, utilizando situações e dilemas cotidianos em vez de termos técnicos ou jargões da ciência política.
+Uma aplicação web interativa (https://davisonesoliveira-netizen.github.io/quiz-politico/), leve e didática projetada para público geral. O objetivo do quiz é explicar conceitos do espectro político de forma prática e acessível, utilizando situações e dilemas cotidianos em vez de termos técnicos ou jargões da ciência política.
 
 ---
 
